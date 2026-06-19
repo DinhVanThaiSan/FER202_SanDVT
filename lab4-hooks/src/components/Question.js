@@ -1,25 +1,16 @@
 import React, { useContext, useState } from "react";
 import { QuizContext } from "../context/QuizContext";
 
-export default function Question({ question }) {
+function Question({ question }) {
+  const { score, setScore } = useContext(QuizContext);
 
-  const { score, setScore } =
-    useContext(QuizContext);
+  const [answered, setAnswered] = useState(false);
+  const [result, setResult] = useState("");
 
-  const [answered, setAnswered] =
-    useState(false);
-
-  const [result, setResult] =
-    useState("");
-
-  const checkAnswer = (selectedAnswer) => {
-
+  const handleAnswer = (answer) => {
     if (answered) return;
 
-    if (
-      selectedAnswer ===
-      question.correctAnswer
-    ) {
+    if (answer === question.correctAnswer) {
       setScore(score + 1);
       setResult("Correct");
     } else {
@@ -30,29 +21,22 @@ export default function Question({ question }) {
   };
 
   return (
-    <div
-      style={{
-        border: "1px solid gray",
-        padding: "10px",
-        margin: "10px"
-      }}
-    >
+    <div className="question-card">
       <h3>{question.question}</h3>
 
-      {question.answers.map(
-        (answer, index) => (
-          <button
-            key={index}
-            onClick={() =>
-              checkAnswer(answer)
-            }
-          >
-            {answer}
-          </button>
-        )
-      )}
+      {question.answers.map((answer, index) => (
+        <button
+          key={index}
+          className="answer-btn"
+          onClick={() => handleAnswer(answer)}
+        >
+          {answer}
+        </button>
+      ))}
 
       <p>{result}</p>
     </div>
   );
 }
+
+export default Question;

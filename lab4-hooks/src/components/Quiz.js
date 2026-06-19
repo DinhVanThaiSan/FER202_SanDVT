@@ -1,93 +1,143 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Question from "./Question";
+import Score from "./Score";
+import { QuizContext } from "../context/QuizContext";
 import "../App.css";
 
-const quizData = [
-  {
-    question: "What is ReactJS?",
-    answers: [
-      "A JavaScript library for building user interfaces",
-      "A programming language",
-      "A database management system",
-    ],
-    correctAnswer: "A JavaScript library for building user interfaces",
-  },
-  {
-    question: "What is JSX?",
-    answers: [
-      "A programming language",
-      "A file format",
-      "A syntax extension for JavaScript",
-    ],
-    correctAnswer: "A syntax extension for JavaScript",
-  },
-];
-
 function Quiz() {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+
   const [score, setScore] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
 
-  const handleNext = () => {
-    if (selectedAnswer === quizData[currentQuestion].correctAnswer) {
-      setScore(score + 1);
-    }
+  const [questions, setQuestions] = useState([]);
 
-    setSelectedAnswer("");
+  const [question, setQuestion] = useState("");
 
-    if (currentQuestion + 1 < quizData.length) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setIsCompleted(true);
-    }
+  const [answer1, setAnswer1] = useState("");
+
+  const [answer2, setAnswer2] = useState("");
+
+  const [answer3, setAnswer3] = useState("");
+
+  const [correctAnswer, setCorrectAnswer] = useState("");
+
+  useEffect(() => {
+
+    const defaultQuestions = [
+      {
+        question: "What is ReactJS?",
+        answers: [
+          "A JavaScript library for building user interfaces",
+          "A programming language",
+          "A database management system"
+        ],
+        correctAnswer:
+          "A JavaScript library for building user interfaces"
+      },
+      {
+        question: "What is JSX?",
+        answers: [
+          "A programming language",
+          "A file format",
+          "A syntax extension for JavaScript"
+        ],
+        correctAnswer:
+          "A syntax extension for JavaScript"
+      }
+    ];
+
+    setQuestions(defaultQuestions);
+
+  }, []);
+
+  const addQuestion = () => {
+
+    const newQuestion = {
+      question,
+      answers: [answer1, answer2, answer3],
+      correctAnswer
+    };
+
+    setQuestions([...questions, newQuestion]);
+
+    setQuestion("");
+    setAnswer1("");
+    setAnswer2("");
+    setAnswer3("");
+    setCorrectAnswer("");
   };
 
   return (
-    <div className="quiz-container">
-      <div className="question-box">
-        {!isCompleted && (
-          <>
-            <hr />
-            <h2>Question {currentQuestion + 1}</h2>
+    <QuizContext.Provider value={{ score, setScore }}>
 
-            <p>{quizData[currentQuestion].question}</p>
+      <div className="quiz-container">
 
-            <div className="answer-list">
-              {quizData[currentQuestion].answers.map((answer, index) => (
-                <label className="answer-item" key={index}>
-                  <input
-                    type="radio"
-                    name="answer"
-                    value={answer}
-                    checked={selectedAnswer === answer}
-                    onChange={() => setSelectedAnswer(answer)}
-                  />
-                  {answer}
-                </label>
-              ))}
-            </div>
+        <div className="left">
 
-            <button
-              className="next-btn"
-              onClick={handleNext}
-              disabled={selectedAnswer === ""}
-            >
-              Next
-            </button>
-          </>
-        )}
+          <h2>Add New Question</h2>
+
+          <input
+            placeholder="Question"
+            value={question}
+            onChange={(e) =>
+              setQuestion(e.target.value)
+            }
+          />
+
+          <input
+            placeholder="Answer 1"
+            value={answer1}
+            onChange={(e) =>
+              setAnswer1(e.target.value)
+            }
+          />
+
+          <input
+            placeholder="Answer 2"
+            value={answer2}
+            onChange={(e) =>
+              setAnswer2(e.target.value)
+            }
+          />
+
+          <input
+            placeholder="Answer 3"
+            value={answer3}
+            onChange={(e) =>
+              setAnswer3(e.target.value)
+            }
+          />
+
+          <input
+            placeholder="Correct Answer"
+            value={correctAnswer}
+            onChange={(e) =>
+              setCorrectAnswer(e.target.value)
+            }
+          />
+
+          <button onClick={addQuestion}>
+            Add Question
+          </button>
+
+          <hr />
+
+          <h2>Quiz Questions</h2>
+
+          {questions.map((q, index) => (
+            <Question
+              key={index}
+              question={q}
+            />
+          ))}
+        </div>
+
+        <div className="right">
+          <Score />
+        </div>
+
       </div>
 
-      <div className="result-box">
-        <hr />
-        {isCompleted && (
-          <>
-            <h1>Quiz Completed!</h1>
-            <p>Your score: {score}</p>
-          </>
-        )}
-      </div>
-    </div>
+    </QuizContext.Provider>
   );
 }
 
